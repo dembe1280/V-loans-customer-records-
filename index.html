@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Loan Records</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f2f2f2;
+}
+.container {
+  background: white;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #003366;
+  color: white;
+}
+button {
+  padding: 5px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Student Loan Records</h2>
+
+<input id="name" placeholder="Student Name">
+<input id="amount" type="number" placeholder="Amount">
+<select id="period">
+  <option value="7">7 days</option>
+  <option value="14">14 days</option>
+  <option value="30">30 days</option>
+</select>
+<select id="gadget">
+  <option>Laptop</option>
+  <option>Smartphone</option>
+  <option>Tablet</option>
+  <option>Gaming Console</option>
+</select>
+
+<button onclick="addLoan()">Add Loan</button>
+
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Name</th>
+<th>Amount</th>
+<th>Repayment</th>
+<th>Period</th>
+<th>Gadget</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+
+</div>
+
+<script>
+let loans = JSON.parse(localStorage.getItem("loans")) || [];
+
+function addLoan() {
+  let name = document.getElementById("name").value;
+  let amount = Number(document.getElementById("amount").value);
+  let period = document.getElementById("period").value;
+  let gadget = document.getElementById("gadget").value;
+
+  if (!name || amount <= 0) {
+    alert("Enter valid details");
+    return;
+  }
+
+  let loan = {
+    date: new Date().toLocaleDateString(),
+    name: name,
+    amount: amount,
+    repayment: (amount * 1.3).toFixed(2),
+    period: period,
+    gadget: gadget,
+    status: "Not Paid"
+  };
+
+  loans.push(loan);
+  localStorage.setItem("loans", JSON.stringify(loans));
+  draw();
+}
+
+function draw() {
+  let html = "";
+  for (let i = 0; i < loans.length; i++) {
+    html += `
+      <tr>
+        <td>${loans[i].date}</td>
+        <td>${loans[i].name}</td>
+        <td>R${loans[i].amount}</td>
+        <td>R${loans[i].repayment}</td>
+        <td>${loans[i].period} days</td>
+        <td>${loans[i].gadget}</td>
+        <td>${loans[i].status}</td>
+        <td>
+          <button onclick="markPaid(${i})">Paid</button>
+          <button onclick="removeLoan(${i})">Delete</button>
+        </td>
+      </tr>`;
+  }
+  document.getElementById("rows").innerHTML = html;
+}
+
+function markPaid(i) {
+  loans[i].status = "Paid";
+  localStorage.setItem("loans", JSON.stringify(loans));
+  draw();
+}
+
+function removeLoan(i) {
+  loans.splice(i, 1);
+  localStorage.setItem("loans", JSON.stringify(loans));
+  draw();
+}
+
+draw();
+</script>
+
+</body>
+</html>
